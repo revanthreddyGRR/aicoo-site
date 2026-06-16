@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AICOO — Operational intelligence for supply chains</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0D0E12; --bg2:#13151B; --bg3:#1A1D26; --line:#262932;
+  --ink:#EDEEF0; --ink-dim:#8B8F9C; --ink-faint:#4D515E;
+  --amber:#FF8A3D; --blue:#4D7FFF; --green:#3DDC84; --red:#FF6B6B;
+  --disp:'Archivo Expanded',sans-serif; --body:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.6;}
+a{color:inherit;text-decoration:none;cursor:pointer;}
+.aw{max-width:1180px;margin:0 auto;padding:0 32px;}
+.ops-dot{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--green);opacity:0.5;animation:blink 2.4s infinite;}
+@keyframes blink{0%,100%{opacity:0.15;}50%{opacity:0.8;}}
+
+.a-nav{position:sticky;top:0;z-index:50;background:rgba(13,14,18,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.nav-row{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;max-width:1180px;margin:0 auto;}
+.a-logo{font-family:var(--disp);font-weight:700;font-size:19px;cursor:pointer;}
+.a-logo span{color:var(--amber);}
+.nav-links{display:flex;gap:8px;font-size:13px;}
+.nav-tab{padding:8px 16px;border-radius:5px;color:var(--ink-dim);transition:all .15s;}
+.nav-tab:hover{color:var(--ink);background:var(--bg3);}
+.nav-tab.on{color:var(--ink);background:var(--bg3);}
+.nav-cta{display:flex;align-items:center;gap:18px;}
+.btn-ghost{font-size:13.5px;color:var(--ink-dim);}
+.btn-solid{background:var(--amber);color:#1A0E04;font-weight:600;font-size:13.5px;padding:9px 18px;border-radius:4px;}
+
+.page{display:none;}
+.page.on{display:block;}
+
+.hero{position:relative;padding:80px 32px 64px;border-bottom:1px solid var(--line);overflow:hidden;}
+.eyebrow{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;color:var(--amber);letter-spacing:0.12em;margin-bottom:26px;}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:blink 1.8s infinite;}
+.hero-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:60px;align-items:center;position:relative;z-index:2;}
+.a-h1{font-family:var(--disp);font-weight:700;font-size:48px;line-height:1.05;letter-spacing:-0.01em;margin-bottom:20px;}
+.a-h1 .accent{color:var(--amber);}
+.hero-sub{font-size:16.5px;color:var(--ink-dim);max-width:460px;margin-bottom:32px;}
+.hero-actions{display:flex;gap:13px;margin-bottom:24px;}
+.btn-primary{background:var(--amber);color:#1A0E04;font-weight:600;font-size:14.5px;padding:14px 24px;border-radius:4px;}
+.btn-secondary{font-size:14.5px;border:1px solid var(--line);padding:14px 20px;border-radius:4px;}
+.hero-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);}
+.hero-visual{background:var(--bg2);border:1px solid var(--line);border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color .15s;}
+.hero-visual:hover{border-color:var(--ink-faint);}
+.hv-bar{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--bg3);}
+.hv-bar-label{font-family:var(--mono);font-size:11px;color:var(--ink-faint);}
+.hv-bar-status{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--green);}
+.hv-bar-status .d{width:5px;height:5px;border-radius:50%;background:var(--green);}
+.hv-body{padding:18px 16px;}
+.hv-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.hv-stat{background:var(--bg3);border-radius:5px;padding:10px 12px;}
+.hv-stat-val{font-family:var(--mono);font-size:18px;font-weight:500;}
+.hv-stat-lbl{font-size:10.5px;color:var(--ink-faint);margin-top:3px;}
+.hv-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);}
+.hv-row:last-child{border-bottom:none;}
+.hv-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.hv-name{font-size:12.5px;flex:1;}
+.hv-days{font-family:var(--mono);font-size:11px;color:var(--ink-faint);}
+.hv-cta{padding:11px 16px;background:var(--bg3);text-align:center;font-size:12.5px;color:var(--blue);border-top:1px solid var(--line);}
+
+.trust{padding:44px 32px;border-bottom:1px solid var(--line);}
+.trust-label{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.1em;text-align:center;margin-bottom:24px;}
+.trust-row{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;}
+.trust-name{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--ink-faint);}
+
+.feature{padding:80px 32px;border-bottom:1px solid var(--line);}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;max-width:1180px;margin:0 auto;}
+.feature.rev .feature-grid{direction:rtl;}
+.feature.rev .feature-grid>*{direction:ltr;}
+.f-tag{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;margin-bottom:16px;}
+.f-tag.blue{color:var(--blue);}.f-tag.amber{color:var(--amber);}
+.f-tag .d{width:6px;height:6px;border-radius:50%;}
+.f-tag.blue .d{background:var(--blue);}.f-tag.amber .d{background:var(--amber);}
+.a-h2{font-family:var(--disp);font-weight:600;font-size:28px;line-height:1.2;margin-bottom:14px;}
+.f-body{font-size:14.5px;color:var(--ink-dim);margin-bottom:18px;max-width:400px;line-height:1.65;}
+.f-link{font-size:13.5px;font-weight:500;}
+.f-link.blue{color:var(--blue);}.f-link.amber{color:var(--amber);}
+.fv-card{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:20px;}
+.fv-title{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);margin-bottom:13px;}
+.fv-order{background:var(--bg3);border-radius:6px;padding:15px;}
+.fv-order-row{display:flex;justify-content:space-between;margin-bottom:9px;font-size:12.5px;}
+.fv-order-row span:first-child{color:var(--ink-faint);}
+.fv-btn{width:100%;background:var(--green);color:#0A1F12;font-weight:600;font-size:12.5px;padding:10px;border-radius:5px;text-align:center;margin-top:5px;cursor:pointer;}
+.chat-bubble{padding:10px 13px;border-radius:9px;font-size:12.5px;margin-bottom:9px;max-width:90%;}
+.chat-ai{background:rgba(77,127,255,.12);border-bottom-left-radius:3px;}
+.chat-user{background:var(--bg3);margin-left:auto;border-bottom-right-radius:3px;}
+.fv-chart{height:120px;}
+
+.proof{padding:64px 32px;border-bottom:1px solid var(--line);background:var(--bg2);}
+.proof-inner{max-width:600px;margin:0 auto;text-align:center;}
+.proof-num{font-family:var(--disp);font-weight:700;font-size:56px;color:var(--amber);}
+.proof-text{font-size:15.5px;color:var(--ink-dim);margin:12px 0;}
+
+.pricing{padding:80px 32px;border-bottom:1px solid var(--line);}
+.pricing-head{text-align:center;margin-bottom:48px;}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:700px;margin:0 auto;}
+.plan-card{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:28px;cursor:pointer;transition:border-color .15s;}
+.plan-card:hover{border-color:var(--ink-faint);}
+.plan-card.featured{border-color:var(--blue);position:relative;}
+.plan-badge{position:absolute;top:-10px;left:28px;background:var(--blue);color:#fff;font-size:10.5px;font-weight:600;padding:4px 11px;border-radius:4px;}
+.plan-name{font-family:var(--disp);font-weight:600;font-size:17px;margin-bottom:6px;}
+.plan-for{font-size:12.5px;color:var(--ink-faint);margin-bottom:18px;}
+.plan-price{font-family:var(--mono);font-size:30px;}
+.plan-price span{font-size:12px;color:var(--ink-faint);}
+.plan-period{font-size:11px;color:var(--ink-faint);margin-bottom:18px;}
+.plan-feat{display:flex;gap:8px;font-size:13px;color:var(--ink-dim);padding:6px 0;border-bottom:1px solid var(--line);}
+.plan-feat:last-child{border-bottom:none;}
+.check{color:var(--green);font-family:var(--mono);font-size:11px;}
+.plan-btn{display:block;text-align:center;margin-top:18px;width:100%;padding:12px;border-radius:5px;font-weight:600;font-size:13.5px;}
+.plan-btn.outline{border:1px solid var(--line);}
+.plan-btn.solid{background:var(--blue);color:#fff;}
+
+.dash-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:var(--bg2);border-bottom:1px solid var(--line);}
+.dash-back{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-dim);cursor:pointer;}
+.dash-back:hover{color:var(--ink);}
+.dash-pill{font-family:var(--mono);font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px;}
+.dash-pill .d{width:5px;height:5px;border-radius:50%;background:var(--green);}
+
+.lite-shell{max-width:400px;margin:28px auto;background:var(--bg2);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+.lite-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+.lite-store{font-size:14px;font-weight:600;}
+.lite-sync{font-size:11px;color:var(--ink-faint);}
+.lite-bell{width:32px;height:32px;border-radius:50%;background:rgba(255,107,107,.12);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;}
+.lite-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);}
+.lite-kpi{background:var(--bg2);padding:12px;text-align:center;}
+.lite-kpi-v{font-family:var(--mono);font-size:20px;font-weight:600;}
+.lite-kpi-l{font-size:10px;color:var(--ink-faint);margin-top:2px;}
+.lite-alertbar{margin:14px 16px 0;background:rgba(255,107,107,.1);border-radius:9px;padding:11px 13px;font-size:12.5px;color:var(--red);cursor:pointer;}
+.lite-alertbar strong{display:block;font-size:13.5px;}
+.lite-list{padding:14px 16px 18px;display:flex;flex-direction:column;gap:9px;}
+.lite-card{background:var(--bg3);border-radius:9px;padding:12px 14px;cursor:pointer;transition:background .15s;}
+.lite-card:hover{background:#1F232E;}
+.lc-top{display:flex;justify-content:space-between;margin-bottom:8px;}
+.lc-name{font-size:13px;font-weight:600;}
+.lc-cat{font-size:10px;color:var(--ink-faint);font-family:var(--mono);}
+.lc-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:11px;}
+.lc-bar-bg{height:4px;background:var(--bg);border-radius:2px;margin-bottom:8px;overflow:hidden;}
+.lc-bar-fill{height:100%;border-radius:2px;}
+.lc-stats{font-family:var(--mono);font-size:11px;color:var(--ink-faint);}
+.lite-nav{display:flex;border-top:1px solid var(--line);}
+.lite-nav div{flex:1;text-align:center;padding:10px 0;font-size:10.5px;color:var(--ink-faint);}
+
+.pro-shell{display:flex;min-height:600px;}
+.pro-side{width:180px;background:var(--bg2);border-right:1px solid var(--line);padding:18px 12px;flex-shrink:0;}
+.pro-side-label{font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;padding:0 8px;margin:16px 0 7px;letter-spacing:.06em;}
+.pro-side-label:first-child{margin-top:0;}
+.pro-side-item{padding:9px 12px;border-radius:7px;font-size:13px;color:var(--ink-dim);margin-bottom:2px;cursor:pointer;display:flex;align-items:center;gap:9px;}
+.pro-side-item:hover{background:var(--bg3);}
+.pro-side-item.on{background:rgba(77,127,255,.12);color:var(--blue);}
+.pro-side-badge{margin-left:auto;font-size:10px;font-weight:600;padding:2px 7px;border-radius:9px;}
+.pro-main{flex:1;padding:24px;background:var(--bg);}
+.pro-kpis{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px;margin-bottom:16px;}
+.pro-kpi{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:13px;}
+.pro-kpi-v{font-family:var(--mono);font-size:18px;font-weight:600;}
+.pro-kpi-l{font-size:11px;color:var(--ink-faint);margin-top:3px;}
+.pro-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.pro-panel{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:15px;}
+.pro-panel-title{font-size:11px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;}
+.pro-risk{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--line);}
+.pro-risk:last-child{border-bottom:none;}
+.pro-risk-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.pro-risk-name{font-size:12px;flex:1;}
+.pro-risk-days{font-family:var(--mono);font-size:11px;color:var(--ink-faint);}
+.pro-risk-btn{font-size:10.5px;padding:4px 9px;border-radius:7px;font-weight:600;cursor:pointer;}
+.pro-cop-line{padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:8px;cursor:pointer;}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:24px;z-index:200;}
+.modal-box{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:24px;width:100%;max-width:320px;}
+.modal-title{font-family:var(--disp);font-weight:600;font-size:16px;margin-bottom:5px;}
+.modal-sub{font-size:12px;color:var(--ink-faint);margin-bottom:16px;}
+.modal-field-l{font-size:10px;color:var(--ink-faint);text-transform:uppercase;margin-bottom:4px;}
+.modal-field-v{background:var(--bg3);border-radius:7px;padding:9px 11px;font-family:var(--mono);font-size:13px;margin-bottom:10px;}
+.modal-confirm{width:100%;padding:12px;background:var(--green);color:#0A1F12;border-radius:7px;font-weight:600;font-size:13.5px;text-align:center;cursor:pointer;margin-top:5px;}
+.modal-cancel{width:100%;padding:9px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;text-align:center;cursor:pointer;margin-top:8px;color:var(--ink-dim);}
+
+footer{padding:48px 32px 24px;}
+.foot-bottom{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-faint);padding-top:18px;border-top:1px solid var(--line);max-width:1180px;margin:0 auto;}
+
+@media(max-width:860px){
+  .hero-grid,.feature-grid{grid-template-columns:1fr;}
+  .feature.rev .feature-grid{direction:ltr;}
+  .plan-grid{grid-template-columns:1fr;}
+  .pro-shell{flex-direction:column;}
+  .pro-side{width:100%;display:flex;gap:8px;overflow-x:auto;}
+  .nav-links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav class="a-nav">
+  <div class="nav-row">
+    <div class="a-logo" onclick="goPage('home')">AI<span>COO</span></div>
+    <div class="nav-links" id="nav-tabs">
+      <a class="nav-tab" data-p="home" onclick="goPage('home')">Home</a>
+      <a class="nav-tab" data-p="lite" onclick="goPage('lite')">AICOO Lite</a>
+      <a class="nav-tab" data-p="pro" onclick="goPage('pro')">AICOO Pro</a>
+      <a class="nav-tab" data-p="pricing" onclick="goPage('pricing')">Pricing</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn-ghost" onclick="goPage('lite')">Log in</a>
+      <a class="btn-solid" onclick="goPage('pricing')">Request a demo</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page on" id="page-home">
+  <section class="hero">
+    <div class="ops-dot" style="top:60px;left:80px;"></div>
+    <div class="aw hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dot"></span>OPERATIONAL INTELLIGENCE</div>
+        <h1 class="a-h1">Stop reacting.<br>Start <span class="accent">deciding.</span></h1>
+        <p class="hero-sub">AICOO watches your inventory, suppliers, and demand around the clock — and tells you exactly what to do before a stockout finds you first.</p>
+        <div class="hero-actions">
+          <a class="btn-primary" onclick="goPage('pricing')">Start free trial</a>
+          <a class="btn-secondary" onclick="goPage('pro')">▶ See how it works</a>
+        </div>
+        <div class="hero-meta">NO CREDIT CARD · 30-DAY TRIAL · SETUP IN UNDER A WEEK</div>
+      </div>
+      <div class="hero-visual" onclick="goPage('pro')">
+        <div class="hv-bar"><span class="hv-bar-label">INVENTORY.LIVE</span><span class="hv-bar-status"><span class="d"></span>SYNCED 4M AGO</span></div>
+        <div class="hv-body">
+          <div class="hv-stat-row">
+            <div class="hv-stat"><div class="hv-stat-val" style="color:var(--red)">5</div><div class="hv-stat-lbl">Critical</div></div>
+            <div class="hv-stat"><div class="hv-stat-val" style="color:var(--amber)">$1.4M</div><div class="hv-stat-lbl">Excess</div></div>
+            <div class="hv-stat"><div class="hv-stat-val" style="color:var(--green)">94%</div><div class="hv-stat-lbl">Fill rate</div></div>
+          </div>
+          <div class="hv-row"><div class="hv-dot" style="background:var(--red)"></div><div class="hv-name">Steel rod 12mm</div><div class="hv-days">6d left</div></div>
+          <div class="hv-row"><div class="hv-dot" style="background:var(--red)"></div><div class="hv-name">Hydraulic fluid 5L</div><div class="hv-days">8d left</div></div>
+          <div class="hv-row"><div class="hv-dot" style="background:var(--amber)"></div><div class="hv-name">Aluminum sheet 2mm</div><div class="hv-days">14d left</div></div>
+        </div>
+        <div class="hv-cta">Open the full dashboard →</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust">
+    <div class="trust-label">TRUSTED BY GROWING OPERATIONS TEAMS</div>
+    <div class="trust-row"><span class="trust-name">DFW STEEL SUPPLY</span><span class="trust-name">METRO FOODS CO.</span><span class="trust-name">GOLDEN GRAINS</span><span class="trust-name">FASTBEAR INC.</span><span class="trust-name">WELDPRO TX</span></div>
+  </section>
+
+  <section class="feature">
+    <div class="feature-grid">
+      <div>
+        <div class="f-tag amber"><span class="d"></span>AUTO-REPLENISHMENT</div>
+        <h2 class="a-h2">Never run out.<br>Never overstock.</h2>
+        <p class="f-body">AICOO calculates exactly when and how much to order — then drafts the purchase order for you. One tap sends it straight to your supplier.</p>
+        <a class="f-link amber" onclick="goPage('lite')">See it in the Lite dashboard →</a>
+      </div>
+      <div class="fv-card">
+        <div class="fv-title">PURCHASE ORDER — DRAFT</div>
+        <div class="fv-order">
+          <div class="fv-order-row"><span>Product</span><span>Olive oil 1L</span></div>
+          <div class="fv-order-row"><span>Supplier</span><span>Al-Wadi Suppliers</span></div>
+          <div class="fv-order-row"><span>Quantity</span><span>24 units</span></div>
+          <div class="fv-order-row"><span>Est. cost</span><span>$144</span></div>
+          <div class="fv-btn" onclick="goPage('lite')">Approve — send to supplier</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature rev">
+    <div class="feature-grid">
+      <div>
+        <div class="f-tag blue"><span class="d"></span>AI COPILOT</div>
+        <h2 class="a-h2">Ask your supply chain anything.</h2>
+        <p class="f-body">No reports to run, no dashboards to dig through. Just ask — in plain English — and get an answer grounded in your live data.</p>
+        <a class="f-link blue" onclick="goPage('pro')">Talk to the copilot →</a>
+      </div>
+      <div class="fv-card">
+        <div class="fv-title">COPILOT</div>
+        <div class="chat-bubble chat-ai">Your biggest risk today is <strong>steel rod 12mm</strong> — 6 days of stock left. Want me to draft the order?</div>
+        <div class="chat-bubble chat-user">What's my worst supplier right now?</div>
+        <div class="chat-bubble chat-ai"><strong>Metro Metals</strong> — 61% on-time, 18-day lead time. I'd qualify a backup.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature">
+    <div class="feature-grid">
+      <div>
+        <div class="f-tag amber"><span class="d"></span>AI FORECASTING</div>
+        <h2 class="a-h2">See 90 days into your future.</h2>
+        <p class="f-body">AICOO learns your seasonality and demand patterns, then forecasts what's coming — so you order ahead of the curve, not behind it.</p>
+        <a class="f-link amber" onclick="goPage('pro')">Explore forecasting →</a>
+      </div>
+      <div class="fv-card">
+        <div class="fv-title">90-DAY DEMAND FORECAST</div>
+        <svg class="fv-chart" viewBox="0 0 400 140" preserveAspectRatio="none">
+          <polyline points="0,90 60,82 120,75 180,86 240,68 280,60" fill="none" stroke="#4D7FFF" stroke-width="2"/>
+          <polyline points="280,60 320,48 360,42 400,30" fill="none" stroke="#FF8A3D" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="280" y1="10" x2="280" y2="130" stroke="#262932" stroke-width="1" stroke-dasharray="3,3"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="proof">
+    <div class="proof-inner">
+      <div class="proof-num">22%</div>
+      <div class="proof-text">average reduction in excess inventory within the first 90 days</div>
+    </div>
+  </section>
+
+  <section class="pricing">
+    <div class="aw">
+      <div class="pricing-head"><h2 class="a-h2">Start small. Scale up.</h2><p style="color:var(--ink-dim);font-size:14px;">30-day free trial on every plan. No card required.</p></div>
+      <div class="plan-grid">
+        <div class="plan-card" onclick="goPage('lite')">
+          <div class="plan-name">AICOO Lite</div>
+          <div class="plan-for">Small stores & micro-manufacturers</div>
+          <div class="plan-price">$99<span>/mo</span></div>
+          <div class="plan-period">starting price, scales with SKU count</div>
+          <div class="plan-feat"><span class="check">✓</span>Up to 1,000 SKUs</div>
+          <div class="plan-feat"><span class="check">✓</span>Low stock alerts</div>
+          <div class="plan-feat"><span class="check">✓</span>1-tap auto-reorder</div>
+          <a class="plan-btn outline">Preview Lite</a>
+        </div>
+        <div class="plan-card featured" onclick="goPage('pro')">
+          <div class="plan-badge">MOST POPULAR</div>
+          <div class="plan-name">AICOO Pro</div>
+          <div class="plan-for">Mid-size manufacturers & distributors</div>
+          <div class="plan-price">$999<span>/mo</span></div>
+          <div class="plan-period">starting price, scales with SKU count</div>
+          <div class="plan-feat"><span class="check">✓</span>Everything in Lite</div>
+          <div class="plan-feat"><span class="check">✓</span>AI forecasting + copilot</div>
+          <div class="plan-feat"><span class="check">✓</span>ERP sync (NetSuite, QBO)</div>
+          <a class="plan-btn solid">Preview Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="page" id="page-lite">
+  <div class="dash-topbar">
+    <div class="dash-back" onclick="goPage('home')">← Back to home</div>
+    <div class="dash-pill"><span class="d"></span>AICOO LITE — LIVE PREVIEW</div>
+  </div>
+  <div class="lite-shell">
+    <div class="lite-head">
+      <div><div class="lite-store">Maya's Grocery</div><div class="lite-sync">Synced 4 min ago</div></div>
+      <div class="lite-bell" onclick="openModal('Olive Oil 1L','Al-Wadi Suppliers','24 units','$144')">🔔</div>
+    </div>
+    <div class="lite-kpis">
+      <div class="lite-kpi"><div class="lite-kpi-v" style="color:var(--red)">2</div><div class="lite-kpi-l">Critical</div></div>
+      <div class="lite-kpi"><div class="lite-kpi-v" style="color:var(--amber)">3</div><div class="lite-kpi-l">Soon</div></div>
+      <div class="lite-kpi"><div class="lite-kpi-v" style="color:var(--green)">12</div><div class="lite-kpi-l">OK</div></div>
+    </div>
+    <div class="lite-alertbar" onclick="openModal('Olive Oil 1L','Al-Wadi Suppliers','24 units','$144')">
+      <strong>Olive Oil 1L — 3 days left</strong>AI recommends ordering now. Tap to approve.
+    </div>
+    <div class="lite-list">
+      <div class="lite-card" onclick="openModal('Olive Oil 1L','Al-Wadi Suppliers','24 units','$144')">
+        <div class="lc-top"><div><div class="lc-name">Olive Oil 1L</div><div class="lc-cat">OILS</div></div><div class="lc-badge" style="background:rgba(255,107,107,.15);color:var(--red)">3 days</div></div>
+        <div class="lc-bar-bg"><div class="lc-bar-fill" style="width:8%;background:var(--red)"></div></div>
+        <div class="lc-stats">4 in stock · 24/day</div>
+      </div>
+      <div class="lite-card" onclick="openModal('Basmati Rice 5kg','Golden Grains Co.','30 units','$360')">
+        <div class="lc-top"><div><div class="lc-name">Basmati Rice 5kg</div><div class="lc-cat">GRAINS</div></div><div class="lc-badge" style="background:rgba(255,107,107,.15);color:var(--red)">5 days</div></div>
+        <div class="lc-bar-bg"><div class="lc-bar-fill" style="width:14%;background:var(--red)"></div></div>
+        <div class="lc-stats">6 in stock · 5/day</div>
+      </div>
+      <div class="lite-card" onclick="openModal('Tomato Sauce 500g','Metro Foods','40 units','$120')">
+        <div class="lc-top"><div><div class="lc-name">Tomato Sauce 500g</div><div class="lc-cat">CANNED</div></div><div class="lc-badge" style="background:rgba(255,138,61,.15);color:var(--amber)">9 days</div></div>
+        <div class="lc-bar-bg"><div class="lc-bar-fill" style="width:32%;background:var(--amber)"></div></div>
+        <div class="lc-stats">18 in stock · 7/day</div>
+      </div>
+      <div class="lite-card">
+        <div class="lc-top"><div><div class="lc-name">Bottled Water 500ml</div><div class="lc-cat">DRINKS</div></div><div class="lc-badge" style="background:rgba(61,220,132,.15);color:var(--green)">21 days</div></div>
+        <div class="lc-bar-bg"><div class="lc-bar-fill" style="width:78%;background:var(--green)"></div></div>
+        <div class="lc-stats">84 in stock · 30/day</div>
+      </div>
+    </div>
+    <div class="lite-nav"><div style="color:var(--green)">Stock</div><div>Orders</div><div>Suppliers</div><div>Reports</div><div>Settings</div></div>
+  </div>
+</div>
+
+<div class="page" id="page-pro">
+  <div class="dash-topbar">
+    <div class="dash-back" onclick="goPage('home')">← Back to home</div>
+    <div class="dash-pill"><span class="d"></span>AICOO PRO — LIVE PREVIEW</div>
+  </div>
+  <div class="pro-shell">
+    <div class="pro-side">
+      <div class="pro-side-label">Overview</div>
+      <div class="pro-side-item on" id="pro-tab-dash" onclick="proTab('dash')">Dashboard</div>
+      <div class="pro-side-item" id="pro-tab-cop" onclick="proTab('copilot')">AI Copilot<span class="pro-side-badge" style="background:rgba(77,127,255,.15);color:var(--blue)">AI</span></div>
+      <div class="pro-side-label">Operations</div>
+      <div class="pro-side-item" onclick="openModal('Steel Rod 12mm','DFW Steel Supply','200 units','$9,000')">Inventory<span class="pro-side-badge" style="background:rgba(255,107,107,.15);color:var(--red)">5</span></div>
+      <div class="pro-side-item">Forecasting</div>
+      <div class="pro-side-item">Suppliers</div>
+    </div>
+    <div class="pro-main" id="pro-main-content"></div>
+  </div>
+</div>
+
+<div class="page" id="page-pricing">
+  <div class="dash-topbar">
+    <div class="dash-back" onclick="goPage('home')">← Back to home</div>
+    <div class="dash-pill" style="color:var(--ink-faint)"><span class="d" style="background:var(--ink-faint)"></span>PRICING</div>
+  </div>
+  <section class="pricing" style="border-bottom:none;">
+    <div class="aw">
+      <div class="pricing-head"><h2 class="a-h2">Choose your plan</h2><p style="color:var(--ink-dim);font-size:14px;">30-day free trial. No card required.</p></div>
+      <div class="plan-grid">
+        <div class="plan-card" onclick="goPage('lite')">
+          <div class="plan-name">AICOO Lite</div>
+          <div class="plan-for">Small stores & micro-manufacturers</div>
+          <div class="plan-price">$99<span>/mo</span></div>
+          <div class="plan-period">starting price</div>
+          <div class="plan-feat"><span class="check">✓</span>Up to 1,000 SKUs</div>
+          <div class="plan-feat"><span class="check">✓</span>Low stock alerts</div>
+          <div class="plan-feat"><span class="check">✓</span>1-tap auto-reorder</div>
+          <a class="plan-btn outline">Start with Lite</a>
+        </div>
+        <div class="plan-card featured" onclick="goPage('pro')">
+          <div class="plan-badge">MOST POPULAR</div>
+          <div class="plan-name">AICOO Pro</div>
+          <div class="plan-for">Mid-size manufacturers & distributors</div>
+          <div class="plan-price">$999<span>/mo</span></div>
+          <div class="plan-period">starting price</div>
+          <div class="plan-feat"><span class="check">✓</span>Everything in Lite</div>
+          <div class="plan-feat"><span class="check">✓</span>AI forecasting + copilot</div>
+          <div class="plan-feat"><span class="check">✓</span>ERP sync</div>
+          <a class="plan-btn solid">Start with Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="foot-bottom"><span>© 2026 AICOO Inc.</span><span>Frisco, TX</span></div>
+</footer>
+
+<script>
+function goPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.toggle('on', el.dataset.p===p));
+  if(p==='pro') renderProDash();
+  window.scrollTo(0,0);
+}
+
+function openModal(product, supplier, qty, cost){
+  const m = document.createElement('div');
+  m.className = 'modal-bg';
+  m.onclick = function(e){ if(e.target===m) m.remove(); };
+  m.innerHTML =
+    '<div class="modal-box">' +
+      '<div class="modal-title">Approve purchase order</div>' +
+      '<div class="modal-sub">AI generated · review and approve</div>' +
+      '<div class="modal-field-l">Product</div><div class="modal-field-v">' + product + '</div>' +
+      '<div class="modal-field-l">Supplier</div><div class="modal-field-v">' + supplier + '</div>' +
+      '<div class="modal-field-l">Quantity</div><div class="modal-field-v">' + qty + '</div>' +
+      '<div class="modal-field-l">Est. cost</div><div class="modal-field-v">' + cost + '</div>' +
+      '<div class="modal-confirm" id="modal-confirm-btn">Approve — send to supplier</div>' +
+      '<div class="modal-cancel" id="modal-cancel-btn">Not now</div>' +
+    '</div>';
+  document.body.appendChild(m);
+  m.querySelector('#modal-confirm-btn').onclick = function(){ m.remove(); };
+  m.querySelector('#modal-cancel-btn').onclick = function(){ m.remove(); };
+}
+
+function renderProDash(){
+  document.getElementById('pro-main-content').innerHTML =
+    '<div class="pro-kpis">' +
+      '<div class="pro-kpi"><div class="pro-kpi-v" style="color:var(--red)">5</div><div class="pro-kpi-l">Risks</div></div>' +
+      '<div class="pro-kpi"><div class="pro-kpi-v" style="color:var(--amber)">$1.4M</div><div class="pro-kpi-l">Excess</div></div>' +
+      '<div class="pro-kpi"><div class="pro-kpi-v" style="color:var(--green)">94%</div><div class="pro-kpi-l">Fill rate</div></div>' +
+      '<div class="pro-kpi"><div class="pro-kpi-v">38d</div><div class="pro-kpi-l">Turnover</div></div>' +
+    '</div>' +
+    '<div class="pro-row2">' +
+      '<div class="pro-panel">' +
+        '<div class="pro-panel-title">Stockout risks</div>' +
+        '<div class="pro-risk"><div class="pro-risk-dot" style="background:var(--red)"></div><div class="pro-risk-name">Steel Rod 12mm</div><div class="pro-risk-days">6d</div><div class="pro-risk-btn" style="background:rgba(255,107,107,.15);color:var(--red)" onclick="openModal(\'Steel Rod 12mm\',\'DFW Steel Supply\',\'200 units\',\'$9,000\')">Order</div></div>' +
+        '<div class="pro-risk"><div class="pro-risk-dot" style="background:var(--red)"></div><div class="pro-risk-name">Hydraulic Fluid 5L</div><div class="pro-risk-days">8d</div><div class="pro-risk-btn" style="background:rgba(255,107,107,.15);color:var(--red)" onclick="openModal(\'Hydraulic Fluid 5L\',\'ChemServe TX\',\'50 units\',\'$1,900\')">Order</div></div>' +
+        '<div class="pro-risk"><div class="pro-risk-dot" style="background:var(--amber)"></div><div class="pro-risk-name">Aluminum Sheet 2mm</div><div class="pro-risk-days">14d</div><div class="pro-risk-btn" style="background:rgba(255,138,61,.15);color:var(--amber)" onclick="openModal(\'Aluminum Sheet 2mm\',\'Metro Metals\',\'100 units\',\'$6,200\')">Plan</div></div>' +
+      '</div>' +
+      '<div class="pro-panel">' +
+        '<div class="pro-panel-title">90-day forecast</div>' +
+        '<svg class="fv-chart" viewBox="0 0 300 90" preserveAspectRatio="none">' +
+          '<polyline points="0,60 50,55 100,50 150,58 200,42 230,35" fill="none" stroke="#4D7FFF" stroke-width="2"/>' +
+          '<polyline points="230,35 260,28 300,18" fill="none" stroke="#FF8A3D" stroke-width="2" stroke-dasharray="5,3"/>' +
+          '<line x1="230" y1="5" x2="230" y2="85" stroke="#262932" stroke-dasharray="3,3"/>' +
+        '</svg>' +
+      '</div>' +
+    '</div>' +
+    '<div class="pro-panel">' +
+      '<div class="pro-panel-title">AI Copilot — quick preview</div>' +
+      '<div class="pro-cop-line chat-ai">Your biggest risk today is <strong>Steel Rod 12mm</strong> — 6 days left. Draft the order?</div>' +
+      '<div class="pro-cop-line chat-user" style="margin-left:auto;max-width:80%;">What\'s my worst supplier?</div>' +
+      '<div class="pro-cop-line chat-ai"><strong>Metro Metals</strong> — 61% on-time, 18-day lead time. Qualify a backup.</div>' +
+    '</div>';
+  document.getElementById('pro-tab-dash').classList.add('on');
+  document.getElementById('pro-tab-cop').classList.remove('on');
+}
+
+function proTab(t){
+  document.querySelectorAll('.pro-side-item').forEach(function(el){ el.classList.remove('on'); });
+  if(t==='copilot'){
+    document.getElementById('pro-tab-cop').classList.add('on');
+    document.getElementById('pro-main-content').innerHTML =
+      '<div class="pro-panel" style="min-height:440px;">' +
+        '<div class="pro-panel-title">AI Copilot — full conversation</div>' +
+        '<div class="pro-cop-line chat-ai">Hi 👋 Your top concern today is <strong>Steel Rod 12mm</strong> — only 6 days of stock left. Want me to draft the purchase order?</div>' +
+        '<div class="pro-cop-line chat-user" style="margin-left:auto;max-width:80%;">What\'s my worst performing supplier?</div>' +
+        '<div class="pro-cop-line chat-ai"><strong>Metro Metals</strong> has the lowest on-time rate at 61% with an 18-day lead time — nearly 3x longer than your best supplier. I\'d recommend qualifying a backup.</div>' +
+        '<div class="pro-cop-line chat-user" style="margin-left:auto;max-width:80%;">Draft the order for Steel Rod</div>' +
+        '<div class="pro-cop-line chat-ai" onclick="openModal(\'Steel Rod 12mm\',\'DFW Steel Supply\',\'200 units\',\'$9,000\')" style="cursor:pointer;text-decoration:underline;">Done — tap here to review and approve the draft PO →</div>' +
+      '</div>';
+  } else {
+    renderProDash();
+  }
+}
+
+goPage('home');
+</script>
+</body>
+</html>
